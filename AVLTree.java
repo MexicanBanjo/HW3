@@ -1,6 +1,6 @@
 
 /*
- * *** YOUR NAME GOES HERE / YOUR SECTION NUMBER ***
+ * *** Edwin Johnson / 001 ***
  *
  * This java file is a Java object implementing simple AVL Tree.
  * You are to complete the deleteElement method.
@@ -343,24 +343,51 @@ class LUC_AVLTree {
 
     private Node deleteElement(int value, Node node) {
 
-        /*
-         * ADD CODE HERE
-         * 
-         * NOTE, that you should use the existing coded private methods
-         * in this file, which include:
-         *      - minValueNode,
-         *      - getMaxHeight,
-         *      - getHeight,
-         *      - getBalanceFactor,
-         *      - LLRotation
-         *      - RRRotation,
-         *      - LRRotation,
-         *      - RLRotation.
-         *
-         * To understand what each of these methods do, see the method prologues and
-         * code for each. You can also look at the method InsertElement, as it has do
-         * do many of the same things as this method.
-         */
+        if (node == null) {
+            return null; // Value not found, do nothing
+        }
+
+        if (value < node.value) {
+            node.leftChild = deleteElement(value, node.leftChild);
+        } else if (value > node.value) {
+            node.rightChild = deleteElement(value, node.rightChild);
+        } else {
+            // Node with only one child or no child
+            if (node.leftChild == null) {
+                return node.rightChild;
+            } else if (node.rightChild == null) {
+                return node.leftChild;
+            }
+
+            // Node with two children: Get the inorder successor (smallest in the right subtree)
+            Node temp = minValueNode(node.rightChild);
+            node.value = temp.value;
+            node.rightChild = deleteElement(temp.value, node.rightChild);
+        }
+
+        // Update height of the current node
+        node.height = getMaxHeight(getHeight(node.leftChild), getHeight(node.rightChild)) + 1;
+
+        // Get balance factor to check if rebalancing is needed
+        int bf = getBalanceFactor(node);
+
+        // Left Heavy
+        if (bf > 1) {
+            if (getBalanceFactor(node.leftChild) >= 0) {
+                return LLRotation(node);
+            } else {
+                return LRRotation(node);
+            }
+        }
+
+        // Right Heavy
+        if (bf < -1) {
+            if (getBalanceFactor(node.rightChild) <= 0) {
+                return RRRotation(node);
+            } else {
+                return RLRotation(node);
+            }
+        }
 
         return node;
     }
